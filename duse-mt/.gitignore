@@ -1,0 +1,15 @@
+.obj
+.moc
+*moc_*
+*.o
+mkspecs
+Makefile
+generated
+lib
+include
+.rcc
+.uic
+*.pro.user
+*.Debug
+*.Release
+.qmake.cache
