@@ -1,0 +1,312 @@
+diff --git a/src/app/shell/plugincontroller.cpp b/src/app/shell/plugincontroller.cpp
+index 36c2a7c..2c8e240 100644
+--- a/src/app/shell/plugincontroller.cpp
++++ b/src/app/shell/plugincontroller.cpp
+@@ -42,10 +42,13 @@
+ 
+ #include <duseinterfaces/icore.h>
+ #include <duseinterfaces/iplugin.h>
++#include <duseinterfaces/ijsplugin.h>
++#include <duseinterfaces/iuicontroller.h>
+ 
+ #include <QtModeling/QMetaModelPlugin>
+ 
+ #include <QtWidgets/QTreeWidgetItem>
++#include <QtWidgets/QAction>
+ 
+ #include <QtCore/QDir>
+ #include <QtCore/QJsonArray>
+@@ -126,6 +129,7 @@ bool PluginController::initialize()
+ 
+     // Initialize DuSE-MT plugins
+     IPlugin *dusePlugin;
++    IJsPlugin *duseJsPlugin;
+     int previousPluginListSize = 0;
+     while (pluginList.size() != previousPluginListSize) {
+         previousPluginListSize = pluginList.size();
+@@ -143,6 +147,19 @@ bool PluginController::initialize()
+                 }
+                 if (loadedDependencies == dependencyCount) {
+                     if (dusePlugin->initialize()) {
++                        if ((duseJsPlugin = qobject_cast<DuSE::IJsPlugin *>(dusePlugin))) {
++                            QString toolbarName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ToolbarName")).toString();
++                            QString scriptFile = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ScriptFile")).toString();
++                            QString iconName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("IconName")).toString();
++                            if (!toolbarName.isEmpty() && !scriptFile.isEmpty() && !iconName.isEmpty()) {
++                                QAction *action = new QAction(QIcon::fromTheme(iconName), "", 0);
++                                //action->setData(QVariant::fromValue(scriptFile));
++                                //action->setData(QVariant::fromValue(duseJsPlugin->property("metadata").toString()));//test
++                                action->setData(QVariant::fromValue(duseJsPlugin->metaObject()->className()));//test
++                                connect(action, &QAction::triggered, this, &PluginController::runScript);
++                                ICore::self()->uiController()->addAction(action, "", toolbarName);
++                            }
++                        }
+                         _dusemtPlugins << dusePlugin;
+                         pluginList.removeAll(plugin);
+                     }
+@@ -176,4 +193,18 @@ QStringList PluginController::errorStrings() const
+     return _errorStrings;
+ }
+ 
++bool PluginController::runScript()
++{
++    QAction *action;
++    if ((action = qobject_cast<QAction *>(sender()))) {
++       //QString program = action->data().toString();
++       QString scriptFile = action->data().toString();
++       // IJsPlugin *ijsplugin = qobject_cast<DuSE::IJsPlugin *>(action->data());
++       qDebug() << scriptFile;
++       //test
++       // QPluginLoader loader(dusePluginSubDir.absoluteFilePath(fileName)
++    }
++    return true;
++}
++
+ }
+diff --git a/src/app/shell/plugincontroller.h b/src/app/shell/plugincontroller.h
+index acaab85..6481f20 100644
+--- a/src/app/shell/plugincontroller.h
++++ b/src/app/shell/plugincontroller.h
+@@ -69,6 +69,9 @@ public:
+     virtual const QList<DuSE::IPlugin *> &dusemtPlugins() const;
+     virtual QStringList errorStrings() const;
+ 
++private Q_SLOTS:
++    bool runScript();
++
+ private:
+     QHash<QString, QMetaModelPlugin *> _metamodelPlugins;
+     QList<DuSE::IPlugin *> _dusemtPlugins;
+diff --git a/src/libs/duseinterfaces/duseinterfaces.pro b/src/libs/duseinterfaces/duseinterfaces.pro
+index b1e06eb..b035c48 100644
+--- a/src/libs/duseinterfaces/duseinterfaces.pro
++++ b/src/libs/duseinterfaces/duseinterfaces.pro
+@@ -6,13 +6,15 @@ HEADERS += \
+     iuicontroller.h \
+     iprojectcontroller.h \
+     iplugincontroller.h \
+-    iplugin.h
++    iplugin.h \
++    ijsplugin.h
+ 
+ SOURCES += \
+     icore.cpp \
+     iuicontroller.cpp \
+     iprojectcontroller.cpp \
+     iplugincontroller.cpp \
+-    iplugin.cpp
++    iplugin.cpp \
++    ijsplugin.cpp
+ 
+ DEFINES += DUSEINTERFACES_LIBRARY
+diff --git a/src/libs/duseinterfaces/ijsplugin.cpp b/src/libs/duseinterfaces/ijsplugin.cpp
+index 078c5c3..ca4b4fd 100644
+--- a/src/libs/duseinterfaces/ijsplugin.cpp
++++ b/src/libs/duseinterfaces/ijsplugin.cpp
+@@ -16,7 +16,7 @@ IJsPlugin::~IJsPlugin()
+ 
+ QString IJsPlugin::jsProgram() const
+ {
+-    return "código aqui!";
++    return "aqui!!!";
+ }
+ 
+ }
+diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
+index 288a90a..13628b3 100644
+--- a/src/plugins/plugins.pro
++++ b/src/plugins/plugins.pro
+@@ -4,7 +4,9 @@ CONFIG   += ordered
+ SUBDIRS = \
+     modelinspector \
+ 
+-qtHaveModule(script): SUBDIRS += javascriptconsole
++qtHaveModule(script): SUBDIRS += javascriptconsole \
++                                 jsexample \
++                                 jscomponentpoint
+ 
+ qtHaveModule(quick): SUBDIRS += welcomedashboard \
+                                 designoptimizer \
+diff --git a/src/plugins/welcomedashboard/welcomedashboardplugin.cpp b/src/plugins/welcomedashboard/welcomedashboardplugin.cpp
+index 6a893d3..503dbfe 100644
+--- a/src/plugins/welcomedashboard/welcomedashboardplugin.cpp
++++ b/src/plugins/welcomedashboard/welcomedashboardplugin.cpp
+@@ -55,6 +55,10 @@ WelcomeDashboardPlugin::WelcomeDashboardPlugin(QObject *parent) :
+ {
+ }
+ 
++WelcomeDashboardPlugin::~WelcomeDashboardPlugin()
++{
++}
++
+ bool WelcomeDashboardPlugin::initialize()
+ {
+     _welcomeQuickView->setSource(QUrl("qrc:/welcomedashboard/welcomedashboard.qml"));
+diff --git a/src/plugins/welcomedashboard/welcomedashboardplugin.h b/src/plugins/welcomedashboard/welcomedashboardplugin.h
+index 2679084..1b11750 100644
+--- a/src/plugins/welcomedashboard/welcomedashboardplugin.h
++++ b/src/plugins/welcomedashboard/welcomedashboardplugin.h
+@@ -57,6 +57,7 @@ class WelcomeDashboardPlugin : public IPlugin
+ 
+ public:
+     WelcomeDashboardPlugin(QObject *parent = 0);
++    virtual ~WelcomeDashboardPlugin();
+ 
+     virtual bool initialize();
+ 
+diff --git a/src/app/shell/plugincontroller.cpp b/src/app/shell/plugincontroller.cpp
+index 36c2a7c..ed41c45 100644
+--- a/src/app/shell/plugincontroller.cpp
++++ b/src/app/shell/plugincontroller.cpp
+@@ -42,10 +42,13 @@
+ 
+ #include <duseinterfaces/icore.h>
+ #include <duseinterfaces/iplugin.h>
++#include <duseinterfaces/ijsplugin.h>
++#include <duseinterfaces/iuicontroller.h>
+ 
+ #include <QtModeling/QMetaModelPlugin>
+ 
+ #include <QtWidgets/QTreeWidgetItem>
++#include <QtWidgets/QAction>
+ 
+ #include <QtCore/QDir>
+ #include <QtCore/QJsonArray>
+@@ -126,6 +129,7 @@ bool PluginController::initialize()
+ 
+     // Initialize DuSE-MT plugins
+     IPlugin *dusePlugin;
++    IJsPlugin *duseJsPlugin;
+     int previousPluginListSize = 0;
+     while (pluginList.size() != previousPluginListSize) {
+         previousPluginListSize = pluginList.size();
+@@ -143,6 +147,19 @@ bool PluginController::initialize()
+                 }
+                 if (loadedDependencies == dependencyCount) {
+                     if (dusePlugin->initialize()) {
++                        if ((duseJsPlugin = qobject_cast<DuSE::IJsPlugin *>(dusePlugin))) {
++                            QString toolbarName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ToolbarName")).toString();
++                            QString scriptFile = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ScriptFile")).toString();
++                            QString iconName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("IconName")).toString();
++                            if (!toolbarName.isEmpty() && !scriptFile.isEmpty() && !iconName.isEmpty()) {
++                                QAction *action = new QAction(QIcon::fromTheme(iconName), "", 0);
++                                //action->setData(QVariant::fromValue(scriptFile));
++                                //action->setData(QVariant::fromValue(duseJsPlugin->property("metadata").toString()));//test
++                                action->setData(QVariant::fromValue(duseJsPlugin->metaObject()->));//test
++                                connect(action, &QAction::triggered, this, &PluginController::runScript);
++                                ICore::self()->uiController()->addAction(action, "", toolbarName);
++                            }
++                        }
+                         _dusemtPlugins << dusePlugin;
+                         pluginList.removeAll(plugin);
+                     }
+@@ -176,4 +193,18 @@ QStringList PluginController::errorStrings() const
+     return _errorStrings;
+ }
+ 
++bool PluginController::runScript()
++{
++    QAction *action;
++    if ((action = qobject_cast<QAction *>(sender()))) {
++       //QString program = action->data().toString();
++       QString scriptFile = action->data().toString();
++       // IJsPlugin *ijsplugin = qobject_cast<DuSE::IJsPlugin *>(action->data());
++       qDebug() << scriptFile;
++       //test
++       // QPluginLoader loader(dusePluginSubDir.absoluteFilePath(fileName)
++    }
++    return true;
++}
++
+ }
+diff --git a/src/app/shell/plugincontroller.h b/src/app/shell/plugincontroller.h
+index acaab85..6481f20 100644
+--- a/src/app/shell/plugincontroller.h
++++ b/src/app/shell/plugincontroller.h
+@@ -69,6 +69,9 @@ public:
+     virtual const QList<DuSE::IPlugin *> &dusemtPlugins() const;
+     virtual QStringList errorStrings() const;
+ 
++private Q_SLOTS:
++    bool runScript();
++
+ private:
+     QHash<QString, QMetaModelPlugin *> _metamodelPlugins;
+     QList<DuSE::IPlugin *> _dusemtPlugins;
+diff --git a/src/libs/duseinterfaces/duseinterfaces.pro b/src/libs/duseinterfaces/duseinterfaces.pro
+index b1e06eb..b035c48 100644
+--- a/src/libs/duseinterfaces/duseinterfaces.pro
++++ b/src/libs/duseinterfaces/duseinterfaces.pro
+@@ -6,13 +6,15 @@ HEADERS += \
+     iuicontroller.h \
+     iprojectcontroller.h \
+     iplugincontroller.h \
+-    iplugin.h
++    iplugin.h \
++    ijsplugin.h
+ 
+ SOURCES += \
+     icore.cpp \
+     iuicontroller.cpp \
+     iprojectcontroller.cpp \
+     iplugincontroller.cpp \
+-    iplugin.cpp
++    iplugin.cpp \
++    ijsplugin.cpp
+ 
+ DEFINES += DUSEINTERFACES_LIBRARY
+diff --git a/src/libs/duseinterfaces/ijsplugin.cpp b/src/libs/duseinterfaces/ijsplugin.cpp
+index 078c5c3..ca4b4fd 100644
+--- a/src/libs/duseinterfaces/ijsplugin.cpp
++++ b/src/libs/duseinterfaces/ijsplugin.cpp
+@@ -16,7 +16,7 @@ IJsPlugin::~IJsPlugin()
+ 
+ QString IJsPlugin::jsProgram() const
+ {
+-    return "código aqui!";
++    return "aqui!!!";
+ }
+ 
+ }
+diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
+index 288a90a..13628b3 100644
+--- a/src/plugins/plugins.pro
++++ b/src/plugins/plugins.pro
+@@ -4,7 +4,9 @@ CONFIG   += ordered
+ SUBDIRS = \
+     modelinspector \
+ 
+-qtHaveModule(script): SUBDIRS += javascriptconsole
++qtHaveModule(script): SUBDIRS += javascriptconsole \
++                                 jsexample \
++                                 jscomponentpoint
+ 
+ qtHaveModule(quick): SUBDIRS += welcomedashboard \
+                                 designoptimizer \
+diff --git a/src/plugins/welcomedashboard/welcomedashboardplugin.cpp b/src/plugins/welcomedashboard/welcomedashboardplugin.cpp
+index 6a893d3..503dbfe 100644
+--- a/src/plugins/welcomedashboard/welcomedashboardplugin.cpp
++++ b/src/plugins/welcomedashboard/welcomedashboardplugin.cpp
+@@ -55,6 +55,10 @@ WelcomeDashboardPlugin::WelcomeDashboardPlugin(QObject *parent) :
+ {
+ }
+ 
++WelcomeDashboardPlugin::~WelcomeDashboardPlugin()
++{
++}
++
+ bool WelcomeDashboardPlugin::initialize()
+ {
+     _welcomeQuickView->setSource(QUrl("qrc:/welcomedashboard/welcomedashboard.qml"));
+diff --git a/src/plugins/welcomedashboard/welcomedashboardplugin.h b/src/plugins/welcomedashboard/welcomedashboardplugin.h
+index 2679084..1b11750 100644
+--- a/src/plugins/welcomedashboard/welcomedashboardplugin.h
++++ b/src/plugins/welcomedashboard/welcomedashboardplugin.h
+@@ -57,6 +57,7 @@ class WelcomeDashboardPlugin : public IPlugin
+ 
+ public:
+     WelcomeDashboardPlugin(QObject *parent = 0);
++    virtual ~WelcomeDashboardPlugin();
+ 
+     virtual bool initialize();
+ 
