@@ -5,7 +5,7 @@ SUBDIRS = \
     modelinspector \
 
 qtHaveModule(script): SUBDIRS += javascriptconsole \
-                                 jsexample
+                                 jsarchitecturalmetrics
 
 qtHaveModule(quick): SUBDIRS += welcomedashboard \
                                 designoptimizer \
