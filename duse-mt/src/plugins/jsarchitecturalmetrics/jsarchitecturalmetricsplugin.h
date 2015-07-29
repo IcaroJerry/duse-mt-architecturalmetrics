@@ -38,27 +38,27 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef JSEXAMPLEPLUGIN_H
-#define JSEXAMPLEPLUGIN_H
+#ifndef JSARCHITECTURALMETRICSPLUGIN_H
+#define JSARCHITECTURALMETRICSPLUGIN_H
 
 #include <duseinterfaces/ijsplugin.h>
 
 namespace DuSE
 {
 
-class JsExamplePlugin : public IJsPlugin
+class JsArchitecturalMetricsPlugin : public IJsPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.liveblue.DuSE.IPlugin" FILE "jsexample.json")
+    Q_PLUGIN_METADATA(IID "org.liveblue.DuSE.IPlugin" FILE "jsarchitecturalmetrics.json")
 
 public:
-    JsExamplePlugin(QObject *parent = 0);
-    virtual ~JsExamplePlugin();
+    JsArchitecturalMetricsPlugin(QObject *parent = 0);
+    virtual ~JsArchitecturalMetricsPlugin();
 
     virtual bool initialize();
 };
 
 }
 
-#endif // JSEXAMPLEPLUGIN_H
+#endif // JSARCHITECTURALMETRICSPLUGIN_H
 

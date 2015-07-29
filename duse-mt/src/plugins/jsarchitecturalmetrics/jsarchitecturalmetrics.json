@@ -3,6 +3,7 @@
     "Vendor": "Qt Project",
     "Version": "1.0",
     "ScriptFile": "scriptexample.js",
+    "ScriptsFile": "scriptexample.js",
     "ToolbarName": "mainToolBar",
     "IconName": "accessories-calculator"
 }

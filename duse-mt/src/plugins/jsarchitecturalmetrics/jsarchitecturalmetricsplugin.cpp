@@ -38,21 +38,21 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#include "jsexampleplugin.h"
+#include "jsarchitecturalmetricsplugin.h"
 
 namespace DuSE
 {
 
-JsExamplePlugin::JsExamplePlugin(QObject *parent) :
+JsArchitecturalMetricsPlugin::JsArchitecturalMetricsPlugin(QObject *parent) :
     IJsPlugin(parent)
 {
 }
 
-JsExamplePlugin::~JsExamplePlugin()
+JsArchitecturalMetricsPlugin::~JsArchitecturalMetricsPlugin()
 {
 }
 
-bool JsExamplePlugin::initialize()
+bool JsArchitecturalMetricsPlugin::initialize()
 {
     return true;
 }

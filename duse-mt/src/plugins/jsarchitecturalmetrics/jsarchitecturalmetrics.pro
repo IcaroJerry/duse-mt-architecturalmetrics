@@ -8,8 +8,8 @@ QT += quick widgets
 
 include(../../duse-mt-plugin.pri)
 
-SOURCES += jsexampleplugin.cpp
+SOURCES += jsarchitecturalmetricsplugin.cpp
 
-HEADERS += jsexampleplugin.h
+HEADERS += jsarchitecturalmetricsplugin.h
 
-OTHER_FILES += jsexample.json
+OTHER_FILES += jsarchitecturalmetrics.json
