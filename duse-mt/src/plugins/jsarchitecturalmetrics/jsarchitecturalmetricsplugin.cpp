@@ -40,30 +40,27 @@
 ****************************************************************************/
 #include "jsarchitecturalmetricsplugin.h"
 
-#include "ui_scriptsmetrics.h"
-
 #include <duseinterfaces/iuicontroller.h>
-#include <duseinterfaces/iprojectcontroller.h>
 
 #include <QtCore/QDir>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonValue>
-
-#include <QDebug>
+#include <QtCore/QCoreApplication>
+#include <QtWidgets/QAction>
 
 namespace DuSE
 {
 
 JsArchitecturalMetricsPlugin::JsArchitecturalMetricsPlugin(QObject *parent) :
     IJsPlugin(parent),
-    _scriptsMetrics(new Ui::ScriptsMetrics)
+    _jsArchitecturalMetrics(new JsArchitecturalMetrics)
 {
 }
 
 JsArchitecturalMetricsPlugin::~JsArchitecturalMetricsPlugin()
 {
-    delete _scriptsMetrics;
+    delete _jsArchitecturalMetrics;
 }
 
 bool JsArchitecturalMetricsPlugin::initialize()
@@ -83,20 +80,66 @@ bool JsArchitecturalMetricsPlugin::initialize()
     QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
     QJsonObject jsonObject = jsonDocument.object();
 
-   /* QWidget *scriptsMetricsWidget = new QWidget;
-    _scriptsMetrics->setupUi(scriptsMetricsWidget);*/
+    QString menuName = jsonObject.value(QString("MenuName")).toString();
+    QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
+    QString iconName = jsonObject.value(QString("IconName")).toString();
+    QString scriptFile = jsonObject.value(QString("ScriptFile")).toString();
 
-   QString menuName = jsonObject.value(QString("MenuName")).toString();
-   QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
-   QString iconName = jsonObject.value(QString("IconName")).toString();
-   QString scriptFile = jsonObject.value(QString("ScriptFile")).toString();
+    QAction *actionLoadPanel = new QAction(QIcon::fromTheme(iconName), tr("Open the panel of Architectural Metrics"), this);
+    connect(actionLoadPanel, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(loadPanel()));
+    ICore::self()->uiController()->addAction(actionLoadPanel, menuName);
 
-   QAction *action = new QAction(QIcon::fromTheme(iconName), "", 0);
-   action->setData(QVariant::fromValue(scriptFile));
-   connect(action, &QAction::triggered, this, &JsArchitecturalMetricsPlugin::runScript);
-   ICore::self()->uiController()->addAction(action, menuName, toolbarName);
+    QAction *actionRunScript = new QAction(QIcon::fromTheme(iconName), tr("Run Architectural Metric"), this);
+    actionRunScript->setData(QVariant::fromValue(scriptFile));
+    connect(actionRunScript, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(runScript()));
+    ICore::self()->uiController()->addAction(actionRunScript, "", toolbarName);
 
     return true;
+}
+
+}
+/*
+bool JsArchitecturalMetricsPlugin::initialize()
+{
+    QDir jsArchitecturalMetricsDir(QCoreApplication::applicationDirPath());
+
+    jsArchitecturalMetricsDir.cdUp();
+    jsArchitecturalMetricsDir.cd("src/plugins/jsarchitecturalmetrics/");
+
+    QFile jsonFile(jsArchitecturalMetricsDir.absoluteFilePath("jsarchitecturalmetrics.json"));
+    QString contentJsonFile;
+
+    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    contentJsonFile = jsonFile.readAll();
+    jsonFile.close();
+
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
+    QJsonObject jsonObject = jsonDocument.object();
+
+    //QWidget *scriptsMetricsWidget = new QWidget;
+    //_scriptsMetrics->setupUi(scriptsMetricsWidget);
+
+    QString menuName = jsonObject.value(QString("MenuName")).toString();
+    QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
+    QString iconName = jsonObject.value(QString("IconName")).toString();
+    QString scriptFile = jsonObject.value(QString("ScriptFile")).toString();
+
+    QAction *actionRunScript = new QAction(QIcon::fromTheme(iconName), "", 0);
+    actionRunScript->setData(QVariant::fromValue(scriptFile));
+    connect(actionRunScript, &QAction::triggered, this, &JsArchitecturalMetricsPlugin::scriptsMetrics);
+    ICore::self()->uiController()->addAction(actionRunScript, "", toolbarName);
+
+    QAction *actionOpenConfig = new QAction(QIcon::fromTheme(iconName), "", 0);
+    actionOpenConfig->setData(QVariant::fromValue(scriptFile));
+    connect(actionOpenConfig, &QAction::triggered, this, &JsArchitecturalMetricsPlugin::runScript);
+    ICore::self()->uiController()->addAction(actionOpenConfig, menuName, "");
+
+   return true;
+}
+
+void JsArchitecturalMetricsPlugin::scriptsMetrics()
+{
+    _scriptsMetricsDialog->exec();
 }
 
 bool JsArchitecturalMetricsPlugin::runScript()
@@ -111,4 +154,4 @@ bool JsArchitecturalMetricsPlugin::runScript()
 }
 
 }
-
+*/

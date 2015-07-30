@@ -38,32 +38,45 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-#ifndef JSARCHITECTURALMETRICSPLUGIN_H
-#define JSARCHITECTURALMETRICSPLUGIN_H
-
-#include <duseinterfaces/ijsplugin.h>
-
 #include "jsarchitecturalmetrics.h"
+#include "ui_jsarchitecturalmetrics.h"
+
+#include <duseinterfaces/iplugincontroller.h>
+
+#include <QtCore/QDebug>
 
 namespace DuSE
 {
 
-class JsArchitecturalMetricsPlugin : public IJsPlugin
+JsArchitecturalMetrics::JsArchitecturalMetrics(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::JsArchitecturalMetrics)
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.liveblue.DuSE.IPlugin" FILE "jsarchitecturalmetrics.json")
+    ui->setupUi(this);
 
-public:
-    JsArchitecturalMetricsPlugin(QObject *parent = 0);
-    ~JsArchitecturalMetricsPlugin();
-
-    virtual bool initialize();
-
-private:
-    JsArchitecturalMetrics *_jsArchitecturalMetrics;
-};
-
+    //connect(ui->startPushButton, SIGNAL(clicked()), this, SLOT(run()));
 }
 
-#endif // JSARCHITECTURALMETRICSPLUGIN_H
+JsArchitecturalMetrics::~JsArchitecturalMetrics()
+{
+    delete ui;
+}
 
+void JsArchitecturalMetrics::loadPanel()
+{
+    show();
+}
+
+bool JsArchitecturalMetrics::runScript()
+{
+    QAction *action;
+
+    if ((action = qobject_cast<QAction *>(sender()))) {
+       QString scriptFileName = action->data().toString();
+       qDebug() << scriptFileName;
+    }
+
+    return true;
+}
+
+}
