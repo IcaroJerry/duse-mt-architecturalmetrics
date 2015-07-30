@@ -40,21 +40,74 @@
 ****************************************************************************/
 #include "jsarchitecturalmetricsplugin.h"
 
+#include "ui_scriptsmetrics.h"
+
+#include <duseinterfaces/iuicontroller.h>
+#include <duseinterfaces/iprojectcontroller.h>
+
+#include <QtCore/QDir>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonValue>
+
+#include <QDebug>
+
 namespace DuSE
 {
 
 JsArchitecturalMetricsPlugin::JsArchitecturalMetricsPlugin(QObject *parent) :
-    IJsPlugin(parent)
+    IJsPlugin(parent),
+    _scriptsMetrics(new Ui::ScriptsMetrics)
 {
 }
 
 JsArchitecturalMetricsPlugin::~JsArchitecturalMetricsPlugin()
 {
+    delete _scriptsMetrics;
 }
 
 bool JsArchitecturalMetricsPlugin::initialize()
 {
+    QDir jsArchitecturalMetricsDir(QCoreApplication::applicationDirPath());
+
+    jsArchitecturalMetricsDir.cdUp();
+    jsArchitecturalMetricsDir.cd("src/plugins/jsarchitecturalmetrics/");
+
+    QFile jsonFile(jsArchitecturalMetricsDir.absoluteFilePath("jsarchitecturalmetrics.json"));
+    QString contentJsonFile;
+
+    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    contentJsonFile = jsonFile.readAll();
+    jsonFile.close();
+
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
+    QJsonObject jsonObject = jsonDocument.object();
+
+   /* QWidget *scriptsMetricsWidget = new QWidget;
+    _scriptsMetrics->setupUi(scriptsMetricsWidget);*/
+
+   QString menuName = jsonObject.value(QString("MenuName")).toString();
+   QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
+   QString iconName = jsonObject.value(QString("IconName")).toString();
+   QString scriptFile = jsonObject.value(QString("ScriptFile")).toString();
+
+   QAction *action = new QAction(QIcon::fromTheme(iconName), "", 0);
+   action->setData(QVariant::fromValue(scriptFile));
+   connect(action, &QAction::triggered, this, &JsArchitecturalMetricsPlugin::runScript);
+   ICore::self()->uiController()->addAction(action, menuName, toolbarName);
+
     return true;
+}
+
+bool JsArchitecturalMetricsPlugin::runScript()
+{
+
+ QAction *action;
+
+ if ((action = qobject_cast<QAction *>(sender()))) {
+    QString scriptFileName = action->data().toString();
+ }
+ return true;
 }
 
 }

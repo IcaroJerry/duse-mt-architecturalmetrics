@@ -2,8 +2,10 @@
     "Category": "Scripting",
     "Vendor": "Qt Project",
     "Version": "1.0",
-    "ScriptFile": "scriptexample.js",
-    "ScriptsFile": "scriptexample.js",
+    "Name":"Run Architectural Metrics",
     "ToolbarName": "mainToolBar",
-    "IconName": "accessories-calculator"
+    "MenuName": "menu_Actions",
+    "IconName": "accessories-calculator",
+    "ScriptFile": "scriptexample.js",
+    "ScriptsFile": "scriptexample.js"
 }

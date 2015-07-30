@@ -148,15 +148,16 @@ bool PluginController::initialize()
                 if (loadedDependencies == dependencyCount) {
                     if (dusePlugin->initialize()) {
                         if ((duseJsPlugin = qobject_cast<DuSE::IJsPlugin *>(dusePlugin))) {
-                            QString toolbarName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ToolbarName")).toString();
+                          /*  QString toolbarName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ToolbarName")).toString();
+                            QString menuName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("MenuName")).toString();
                             QString scriptFile = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("ScriptFile")).toString();
                             QString iconName = duseJsPlugin->property("metadata").value<QJsonObject>().value(QStringLiteral("IconName")).toString();
                             if (!toolbarName.isEmpty() && !scriptFile.isEmpty() && !iconName.isEmpty()) {
-                                QAction *action = new QAction(QIcon::fromTheme(iconName), "", 0);
+                                QAction *action = new QAction(QIcon::fromTheme(iconName), "test", 0);
                                 action->setData(QVariant::fromValue(scriptFile));
                                 connect(action, &QAction::triggered, this, &PluginController::runScript);
-                                ICore::self()->uiController()->addAction(action, "", toolbarName);
-                            }
+                                ICore::self()->uiController()->addAction(action, menuName, toolbarName);
+                            }*/
                         }
                         _dusemtPlugins << dusePlugin;
                         pluginList.removeAll(plugin);
@@ -203,7 +204,7 @@ bool PluginController::runScript()
         QDir duseJsPluginsDir(QCoreApplication::applicationDirPath());
 
         duseJsPluginsDir.cdUp();
-        duseJsPluginsDir.cd("src/plugins/jsexample/");
+        duseJsPluginsDir.cd("src/plugins/jsarchitecturalmetrics/");
 
 
             foreach (const QString &fileName, duseJsPluginsDir.entryList(QDir::Files)) {

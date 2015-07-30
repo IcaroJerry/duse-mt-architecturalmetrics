@@ -13,3 +13,6 @@ SOURCES += jsarchitecturalmetricsplugin.cpp
 HEADERS += jsarchitecturalmetricsplugin.h
 
 OTHER_FILES += jsarchitecturalmetrics.json
+
+FORMS += \
+    scriptsmetrics.ui

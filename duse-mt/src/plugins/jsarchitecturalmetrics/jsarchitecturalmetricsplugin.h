@@ -46,6 +46,10 @@
 namespace DuSE
 {
 
+namespace Ui {
+    class ScriptsMetrics;
+}
+
 class JsArchitecturalMetricsPlugin : public IJsPlugin
 {
     Q_OBJECT
@@ -56,6 +60,12 @@ public:
     virtual ~JsArchitecturalMetricsPlugin();
 
     virtual bool initialize();
+
+private Q_SLOTS:
+    bool runScript();
+
+private:
+    Ui::ScriptsMetrics *_scriptsMetrics;
 };
 
 }
