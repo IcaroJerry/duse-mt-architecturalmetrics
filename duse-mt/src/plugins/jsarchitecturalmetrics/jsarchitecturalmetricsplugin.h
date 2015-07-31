@@ -41,14 +41,14 @@
 #ifndef JSARCHITECTURALMETRICSPLUGIN_H
 #define JSARCHITECTURALMETRICSPLUGIN_H
 
-#include <duseinterfaces/ijsplugin.h>
+#include <duseinterfaces/iplugin.h>
 
 #include "jsarchitecturalmetrics.h"
 
 namespace DuSE
 {
 
-class JsArchitecturalMetricsPlugin : public IJsPlugin
+class JsArchitecturalMetricsPlugin : public IPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.liveblue.DuSE.IPlugin" FILE "jsarchitecturalmetrics.json")

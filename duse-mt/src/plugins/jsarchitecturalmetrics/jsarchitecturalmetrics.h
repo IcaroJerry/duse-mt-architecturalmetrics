@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QDialog>
 
-#include <duseinterfaces/ijsplugin.h>
+#include <duseinterfaces/iplugin.h>
 
 namespace DuSE
 {

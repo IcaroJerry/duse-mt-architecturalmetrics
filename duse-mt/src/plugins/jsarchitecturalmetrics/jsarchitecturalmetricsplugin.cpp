@@ -53,7 +53,7 @@ namespace DuSE
 {
 
 JsArchitecturalMetricsPlugin::JsArchitecturalMetricsPlugin(QObject *parent) :
-    IJsPlugin(parent),
+    IPlugin(parent),
     _jsArchitecturalMetrics(new JsArchitecturalMetrics)
 {
 }
