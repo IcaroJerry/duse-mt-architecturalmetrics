@@ -56,22 +56,56 @@ namespace DuSE
 
 JsArchitecturalMetrics::JsArchitecturalMetrics(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::JsArchitecturalMetrics)
+    _ui(new Ui::JsArchitecturalMetrics)
 {
-    ui->setupUi(this);
+    QDir jsArchitecturalMetricsDir(QCoreApplication::applicationDirPath());
 
-    //connect(ui->startPushButton, SIGNAL(clicked()), this, SLOT(run()));
+    jsArchitecturalMetricsDir.cdUp();
+    jsArchitecturalMetricsDir.cd("src/plugins/jsarchitecturalmetrics/");
+
+    _jsArchitecturalMetricsDir = jsArchitecturalMetricsDir.absolutePath();
+    _jsonFileName = "jsarchitecturalmetrics.json";
+
+    _ui->setupUi(this);
+
+    connect(_ui->runPushButton, SIGNAL(clicked()), this, SLOT(runScript()));
+    connect(_ui->setDefaultPushButton, SIGNAL(clicked()), this, SLOT(setMetricDefault()));
+
 }
 
 JsArchitecturalMetrics::~JsArchitecturalMetrics()
 {
-    delete ui;
+    delete _ui;
 }
 
 void JsArchitecturalMetrics::loadPanel()
 {
-    loadInfoScripts();
+    loadMetricsInfo();
     show();
+}
+
+void JsArchitecturalMetrics::setMetricDefault()
+{
+    QFile jsonFile(_jsArchitecturalMetricsDir+"/"+_jsonFileName);
+    QString contentJsonFile;
+
+    if (!jsonFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+            qWarning("Couldn't open json file.");
+            return;
+    }
+
+    contentJsonFile = jsonFile.readAll();
+
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
+    QJsonObject jsonObject = jsonDocument.object();
+    int selectRow = _ui->scriptsMetricsTable->SelectRows;
+
+    jsonObject["MetricDefault"] = _ui->scriptsMetricsTable->item(selectRow, 2)->text();
+
+    QString test = jsonObject["MetricDefault"].toString();
+    qDebug() << test;
+
+    jsonFile.close();
 }
 
 bool JsArchitecturalMetrics::runScript()
@@ -94,53 +128,52 @@ bool JsArchitecturalMetrics::runScript()
     return true;
 }
 
-void JsArchitecturalMetrics::loadInfoScripts()
+void JsArchitecturalMetrics::loadMetricsInfo()
 {
-    QDir jsArchitecturalMetricsDir(QCoreApplication::applicationDirPath());
+    _ui->scriptsMetricsTable->setColumnWidth(1, 240);
+    _ui->scriptsMetricsTable->setColumnWidth(2, 110);
 
-    jsArchitecturalMetricsDir.cdUp();
-    jsArchitecturalMetricsDir.cd("src/plugins/jsarchitecturalmetrics/");
-
-    QFile jsonFile(jsArchitecturalMetricsDir.absoluteFilePath("jsarchitecturalmetrics.json"));
+    QFile jsonFile(_jsArchitecturalMetricsDir+"/"+ _jsonFileName);
     QString contentJsonFile;
 
-    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning("Couldn't open json file.");
+            return;
+    }
+
     contentJsonFile = jsonFile.readAll();
     jsonFile.close();
 
     QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
     QJsonObject jsonObject = jsonDocument.object();
 
+    QString scriptMetricDefault = jsonObject.value("MetricDefault").toString();
+
     QJsonArray scriptsList = jsonObject.value(QString("ScriptsFile")).toArray();
 
     for(int i = 0; i < scriptsList.size(); i++) {
 
         QString metricName;
+        QString shortDescription;
         QString scriptFile;
 
         metricName = scriptsList.at(i).toObject().value("MetricName").toString();
-        scriptFile = scriptsList.at(i).toObject().value("ShortDescription").toString();
+        shortDescription = scriptsList.at(i).toObject().value("ShortDescription").toString();
+        scriptFile = scriptsList.at(i).toObject().value("ScriptFile").toString();
 
-        ui->scriptsMetricsTable->insertRow(0);
+        _ui->scriptsMetricsTable->insertRow(0);
 
-        ui->scriptsMetricsTable->setItem(0, 0, new QTableWidgetItem(metricName));
-        ui->scriptsMetricsTable->setItem(0,1, new QTableWidgetItem(scriptFile));
+        _ui->scriptsMetricsTable->setItem(0, 0, new QTableWidgetItem(metricName));
+        _ui->scriptsMetricsTable->setItem(0, 1, new QTableWidgetItem(shortDescription));
+        _ui->scriptsMetricsTable->setItem(0, 2, new QTableWidgetItem(scriptFile));
 
+        _ui->metricDefaultComboBox->addItem(metricName,QVariant::fromValue(scriptFile));
+
+        if(scriptFile == scriptMetricDefault){
+            _ui->scriptsMetricsTable->selectRow(0);
+            _ui->metricDefaultComboBox->setCurrentIndex(i);
+        }
     }
-
-    //ui->loadedPlugins->ins
-    /*
-    foreach (QMetaModelPlugin *metamodelPlugin, ICore::self()->pluginController()->metamodelPlugins()) {
-        QJsonObject jsonObject = metamodelPlugin->property("metadata").value<QJsonObject>();
-        QTreeWidgetItem *metamodelItem = new QTreeWidgetItem(itemForCategory("Metamodels"),
-                                                             QStringList() << metamodelPlugin->metaObject()->className()
-                                                                           << QString()
-                                                                           << jsonObject.value("Version").toString()
-                                                                           << jsonObject.value("Vendor").toString());
-        metamodelItem->setData(1, Qt::CheckStateRole, QVariant(Qt::Checked));
-    }
-    QJsonArray test = item["imp"].toArray();
-    */
 }
 
 }

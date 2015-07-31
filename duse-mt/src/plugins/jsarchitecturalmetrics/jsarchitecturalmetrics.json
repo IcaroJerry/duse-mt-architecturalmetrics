@@ -8,7 +8,9 @@
     "IconName": "accessories-calculator",
     "MetricDefault": "component_point.js",
     "ScriptsFile": [
-        {"MetricName": "Metric Example", "ScriptFile": "scriptexample.js", "ShortDescription": "blablabla"},
-        {"MetricName": "Component Point", "ScriptFile": "component_point.js", "ShortDescription": "Component Point is a..."}
+        {"MetricName": "Teste2", "ShortDescription": "It's a Teste2", "ScriptFile": "teste_2.js"},
+        {"MetricName": "Metric Example", "ShortDescription": "blablabla", "ScriptFile": "scriptexample.js"},
+        {"MetricName": "Component Point", "ShortDescription": "Component Point is a...", "ScriptFile": "component_point.js"},
+        {"MetricName": "Teste1", "ShortDescription": "It's a Teste1", "ScriptFile": "teste_1.js"}
     ]
 }

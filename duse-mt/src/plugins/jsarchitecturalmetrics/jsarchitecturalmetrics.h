@@ -20,18 +20,20 @@ public:
     explicit JsArchitecturalMetrics(QWidget *parent = 0);
     ~JsArchitecturalMetrics();
 
+    QString _jsArchitecturalMetricsDir;
+    QString _jsonFileName;
+
 public Q_SLOTS:
-    void scriptsMetrics();//apagar
     void loadPanel();
-    //void runScript();//test
+    void setMetricDefault();
     bool runScript();
 
 private:
 
-    void loadInfoScripts();
+    void loadMetricsInfo();
 
     QDialog *_jsArchitecturalMetricsDialog;
-    Ui::JsArchitecturalMetrics *ui;
+    Ui::JsArchitecturalMetrics *_ui;
 
 };
 
