@@ -83,14 +83,14 @@ bool JsArchitecturalMetricsPlugin::initialize()
     QString menuName = jsonObject.value(QString("MenuName")).toString();
     QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
     QString iconName = jsonObject.value(QString("IconName")).toString();
-    QString scriptFile = jsonObject.value(QString("ScriptFile")).toString();
+    QString scriptFile = jsonObject.value(QString("MetricDefault")).toString();
 
     QAction *actionLoadPanel = new QAction(QIcon::fromTheme(iconName), tr("Open the panel of Architectural Metrics"), this);
     connect(actionLoadPanel, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(loadPanel()));
     ICore::self()->uiController()->addAction(actionLoadPanel, menuName);
 
     QAction *actionRunScript = new QAction(QIcon::fromTheme(iconName), tr("Run Architectural Metric"), this);
-    actionRunScript->setData(QVariant::fromValue(scriptFile));
+    actionRunScript->setData(QVariant::fromValue(jsArchitecturalMetricsDir.absoluteFilePath("scripts/"+scriptFile)));
     connect(actionRunScript, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(runScript()));
     ICore::self()->uiController()->addAction(actionRunScript, "", toolbarName);
 
@@ -135,22 +135,6 @@ bool JsArchitecturalMetricsPlugin::initialize()
     ICore::self()->uiController()->addAction(actionOpenConfig, menuName, "");
 
    return true;
-}
-
-void JsArchitecturalMetricsPlugin::scriptsMetrics()
-{
-    _scriptsMetricsDialog->exec();
-}
-
-bool JsArchitecturalMetricsPlugin::runScript()
-{
-
- QAction *action;
-
- if ((action = qobject_cast<QAction *>(sender()))) {
-    QString scriptFileName = action->data().toString();
- }
- return true;
 }
 
 }

@@ -14,7 +14,8 @@ SOURCES += jsarchitecturalmetricsplugin.cpp \
 HEADERS += jsarchitecturalmetricsplugin.h \
     jsarchitecturalmetrics.h
 
-OTHER_FILES += jsarchitecturalmetrics.json
-
 FORMS += \
     jsarchitecturalmetrics.ui
+
+OTHER_FILES += jsarchitecturalmetrics.json
+

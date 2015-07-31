@@ -27,6 +27,9 @@ public Q_SLOTS:
     bool runScript();
 
 private:
+
+    void loadInfoScripts();
+
     QDialog *_jsArchitecturalMetricsDialog;
     Ui::JsArchitecturalMetrics *ui;
 

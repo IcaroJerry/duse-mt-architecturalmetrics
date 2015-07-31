@@ -43,6 +43,12 @@
 
 #include <duseinterfaces/iplugincontroller.h>
 
+#include <QtCore/QDir>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonArray>
+
 #include <QtCore/QDebug>
 
 namespace DuSE
@@ -64,6 +70,7 @@ JsArchitecturalMetrics::~JsArchitecturalMetrics()
 
 void JsArchitecturalMetrics::loadPanel()
 {
+    loadInfoScripts();
     show();
 }
 
@@ -72,11 +79,68 @@ bool JsArchitecturalMetrics::runScript()
     QAction *action;
 
     if ((action = qobject_cast<QAction *>(sender()))) {
-       QString scriptFileName = action->data().toString();
-       qDebug() << scriptFileName;
+       QString scriptDir = action->data().toString();
+
+       QFile scriptFile(scriptDir);
+       QString contentScriptFile;
+
+       scriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
+       contentScriptFile = scriptFile.readAll();
+       scriptFile.close();
+
+       qDebug() << contentScriptFile;
     }
 
     return true;
+}
+
+void JsArchitecturalMetrics::loadInfoScripts()
+{
+    QDir jsArchitecturalMetricsDir(QCoreApplication::applicationDirPath());
+
+    jsArchitecturalMetricsDir.cdUp();
+    jsArchitecturalMetricsDir.cd("src/plugins/jsarchitecturalmetrics/");
+
+    QFile jsonFile(jsArchitecturalMetricsDir.absoluteFilePath("jsarchitecturalmetrics.json"));
+    QString contentJsonFile;
+
+    jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    contentJsonFile = jsonFile.readAll();
+    jsonFile.close();
+
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
+    QJsonObject jsonObject = jsonDocument.object();
+
+    QJsonArray scriptsList = jsonObject.value(QString("ScriptsFile")).toArray();
+
+    for(int i = 0; i < scriptsList.size(); i++) {
+
+        QString metricName;
+        QString scriptFile;
+
+        metricName = scriptsList.at(i).toObject().value("MetricName").toString();
+        scriptFile = scriptsList.at(i).toObject().value("ShortDescription").toString();
+
+        ui->scriptsMetricsTable->insertRow(0);
+
+        ui->scriptsMetricsTable->setItem(0, 0, new QTableWidgetItem(metricName));
+        ui->scriptsMetricsTable->setItem(0,1, new QTableWidgetItem(scriptFile));
+
+    }
+
+    //ui->loadedPlugins->ins
+    /*
+    foreach (QMetaModelPlugin *metamodelPlugin, ICore::self()->pluginController()->metamodelPlugins()) {
+        QJsonObject jsonObject = metamodelPlugin->property("metadata").value<QJsonObject>();
+        QTreeWidgetItem *metamodelItem = new QTreeWidgetItem(itemForCategory("Metamodels"),
+                                                             QStringList() << metamodelPlugin->metaObject()->className()
+                                                                           << QString()
+                                                                           << jsonObject.value("Version").toString()
+                                                                           << jsonObject.value("Vendor").toString());
+        metamodelItem->setData(1, Qt::CheckStateRole, QVariant(Qt::Checked));
+    }
+    QJsonArray test = item["imp"].toArray();
+    */
 }
 
 }

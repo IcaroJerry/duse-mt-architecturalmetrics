@@ -60,6 +60,7 @@ public:
     virtual bool initialize();
 
 private:
+
     JsArchitecturalMetrics *_jsArchitecturalMetrics;
 };
 

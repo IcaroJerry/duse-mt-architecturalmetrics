@@ -6,6 +6,9 @@
     "ToolbarName": "mainToolBar",
     "MenuName": "menu_Actions",
     "IconName": "accessories-calculator",
-    "ScriptFile": "scriptexample.js",
-    "ScriptsFile": "scriptexample.js"
+    "MetricDefault": "component_point.js",
+    "ScriptsFile": [
+        {"MetricName": "Metric Example", "ScriptFile": "scriptexample.js", "ShortDescription": "blablabla"},
+        {"MetricName": "Component Point", "ScriptFile": "component_point.js", "ShortDescription": "Component Point is a..."}
+    ]
 }
