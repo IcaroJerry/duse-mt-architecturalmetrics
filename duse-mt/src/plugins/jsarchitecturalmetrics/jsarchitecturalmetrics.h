@@ -26,11 +26,13 @@ public:
 public Q_SLOTS:
     void loadPanel();
     void setMetricDefault();
-    bool runScript();
+    void runSelectedScript();
+    void runDefaultScript();
 
 private:
-
+    void clearMetricsInfo();
     void loadMetricsInfo();
+    bool runScript(QString scriptFileName);
 
     QDialog *_jsArchitecturalMetricsDialog;
     Ui::JsArchitecturalMetrics *_ui;

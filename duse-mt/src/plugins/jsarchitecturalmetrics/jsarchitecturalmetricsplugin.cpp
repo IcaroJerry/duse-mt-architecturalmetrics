@@ -79,15 +79,13 @@ bool JsArchitecturalMetricsPlugin::initialize()
     QString menuName = jsonObject.value(QString("MenuName")).toString();
     QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
     QString iconName = jsonObject.value(QString("IconName")).toString();
-    QString scriptFile = jsonObject.value(QString("MetricDefault")).toString();
 
     QAction *actionLoadPanel = new QAction(QIcon::fromTheme(iconName), tr("Architectural Metrics..."), this);
     connect(actionLoadPanel, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(loadPanel()));
     ICore::self()->uiController()->addAction(actionLoadPanel, menuName);
 
     QAction *actionRunScript = new QAction(QIcon::fromTheme(iconName), tr("Run Architectural Metric"), this);
-    actionRunScript->setData(QVariant::fromValue(_jsArchitecturalMetrics->_jsArchitecturalMetricsDir+"/scripts/"+scriptFile));
-    connect(actionRunScript, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(runScript()));
+    connect(actionRunScript, SIGNAL(triggered()), _jsArchitecturalMetrics, SLOT(runDefaultScript()));
     ICore::self()->uiController()->addAction(actionRunScript, "", toolbarName);
 
     return true;

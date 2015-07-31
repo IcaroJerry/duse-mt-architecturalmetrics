@@ -1,16 +1,32 @@
 {
     "Category": "Scripting",
-    "Vendor": "Qt Project",
-    "Version": "1.0",
-    "Name":"Run Architectural Metrics",
-    "ToolbarName": "mainToolBar",
-    "MenuName": "menu_Actions",
     "IconName": "accessories-calculator",
+    "MenuName": "menu_Actions",
     "MetricDefault": "component_point.js",
+    "Name": "Run Architectural Metrics",
     "ScriptsFile": [
-        {"MetricName": "Teste2", "ShortDescription": "It's a Teste2", "ScriptFile": "teste_2.js"},
-        {"MetricName": "Metric Example", "ShortDescription": "blablabla", "ScriptFile": "scriptexample.js"},
-        {"MetricName": "Component Point", "ShortDescription": "Component Point is a...", "ScriptFile": "component_point.js"},
-        {"MetricName": "Teste1", "ShortDescription": "It's a Teste1", "ScriptFile": "teste_1.js"}
-    ]
+        {
+            "MetricName": "Teste2",
+            "ScriptFile": "teste_2.js",
+            "ShortDescription": "It's a Teste2"
+        },
+        {
+            "MetricName": "Metric Example",
+            "ScriptFile": "scriptexample.js",
+            "ShortDescription": "blablabla"
+        },
+        {
+            "MetricName": "Component Point",
+            "ScriptFile": "component_point.js",
+            "ShortDescription": "Component Point is a..."
+        },
+        {
+            "MetricName": "Teste1",
+            "ScriptFile": "teste_1.js",
+            "ShortDescription": "It's a Teste1"
+        }
+    ],
+    "ToolbarName": "mainToolBar",
+    "Vendor": "Qt Project",
+    "Version": "1.0"
 }

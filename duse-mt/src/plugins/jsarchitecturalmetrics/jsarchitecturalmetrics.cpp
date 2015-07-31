@@ -68,7 +68,7 @@ JsArchitecturalMetrics::JsArchitecturalMetrics(QWidget *parent) :
 
     _ui->setupUi(this);
 
-    connect(_ui->runPushButton, SIGNAL(clicked()), this, SLOT(runScript()));
+    connect(_ui->runPushButton, SIGNAL(clicked()), this, SLOT(runSelectedScript()));
     connect(_ui->setDefaultPushButton, SIGNAL(clicked()), this, SLOT(setMetricDefault()));
 
 }
@@ -80,6 +80,7 @@ JsArchitecturalMetrics::~JsArchitecturalMetrics()
 
 void JsArchitecturalMetrics::loadPanel()
 {
+    clearMetricsInfo();
     loadMetricsInfo();
     show();
 }
@@ -98,34 +99,53 @@ void JsArchitecturalMetrics::setMetricDefault()
 
     QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
     QJsonObject jsonObject = jsonDocument.object();
-    int selectRow = _ui->scriptsMetricsTable->SelectRows;
 
-    jsonObject["MetricDefault"] = _ui->scriptsMetricsTable->item(selectRow, 2)->text();
+    jsonObject["MetricDefault"] = _ui->metricDefaultComboBox->currentData().toString();
+    jsonDocument.setObject(jsonObject);
 
-    QString test = jsonObject["MetricDefault"].toString();
-    qDebug() << test;
-
+    jsonFile.resize(0);
+    jsonFile.write(jsonDocument.toJson());
     jsonFile.close();
 }
 
-bool JsArchitecturalMetrics::runScript()
+void JsArchitecturalMetrics::runSelectedScript()
 {
-    QAction *action;
+    int selectedRow = _ui->scriptsMetricsTable->currentRow();
 
-    if ((action = qobject_cast<QAction *>(sender()))) {
-       QString scriptDir = action->data().toString();
+    QString scriptFileName = _ui->scriptsMetricsTable->item(selectedRow,2)->text();
 
-       QFile scriptFile(scriptDir);
-       QString contentScriptFile;
+    if(!runScript(scriptFileName))
+        qWarning() << "Couldn't run the selected metric.";
+}
 
-       scriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
-       contentScriptFile = scriptFile.readAll();
-       scriptFile.close();
+void JsArchitecturalMetrics::runDefaultScript()
+{
+    QFile jsonFile(_jsArchitecturalMetricsDir+"/"+ _jsonFileName);
+    QString contentJsonFile;
 
-       qDebug() << contentScriptFile;
+    if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning("Couldn't open json file.");
+            return;
     }
 
-    return true;
+    contentJsonFile = jsonFile.readAll();
+    jsonFile.close();
+
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
+    QJsonObject jsonObject = jsonDocument.object();
+
+    QString scriptMetricDefault = jsonObject.value("MetricDefault").toString();
+
+    if(!runScript(scriptMetricDefault))
+        qWarning() << "Couldn't run the default metric.";
+}
+
+void JsArchitecturalMetrics::clearMetricsInfo()
+{
+    while(_ui->scriptsMetricsTable->rowCount()>0) {
+        _ui->scriptsMetricsTable->removeRow(0);
+    }
+    _ui->metricDefaultComboBox->clear();
 }
 
 void JsArchitecturalMetrics::loadMetricsInfo()
@@ -137,8 +157,8 @@ void JsArchitecturalMetrics::loadMetricsInfo()
     QString contentJsonFile;
 
     if (!jsonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qWarning("Couldn't open json file.");
-            return;
+        qWarning("Couldn't open json file.");
+        return;
     }
 
     contentJsonFile = jsonFile.readAll();
@@ -174,6 +194,25 @@ void JsArchitecturalMetrics::loadMetricsInfo()
             _ui->metricDefaultComboBox->setCurrentIndex(i);
         }
     }
+}
+
+bool JsArchitecturalMetrics::runScript(QString scriptFileName)
+{
+
+    QFile scriptFile(_jsArchitecturalMetricsDir+"/scripts/"+scriptFileName);
+    QString contentScriptFile;
+
+    if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning("Couldn't open metric script file.");
+        return false;
+    }
+
+    contentScriptFile = scriptFile.readAll();
+    scriptFile.close();
+
+    qDebug() << contentScriptFile;
+
+    return true;
 }
 
 }
