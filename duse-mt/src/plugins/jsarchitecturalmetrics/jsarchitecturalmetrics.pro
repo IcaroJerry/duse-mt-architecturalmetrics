@@ -4,18 +4,18 @@
 #
 #-------------------------------------------------
 
-QT += quick widgets
+QT += quick widgets script
 
 include(../../duse-mt-plugin.pri)
 
 SOURCES += jsarchitecturalmetricsplugin.cpp \
-    jsarchitecturalmetrics.cpp
+    jsarchitecturalmetricsconfig.cpp
 
 HEADERS += jsarchitecturalmetricsplugin.h \
-    jsarchitecturalmetrics.h
-
+    jsarchitecturalmetricsconfig.h
 FORMS += \
-    jsarchitecturalmetrics.ui
+    jsarchitecturalmetrics.ui \
+    jsarchitecturalmetricsconfig.ui
 
 OTHER_FILES += jsarchitecturalmetrics.json
 

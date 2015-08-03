@@ -1,45 +1,6 @@
-/****************************************************************************
-**
-** Copyright (C) 2013 Sandro S. Andrade <sandroandrade@kde.org>
-** Contact: http://www.qt-project.org/legal
-**
-** This file is part of the QtUml module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-#include "jsarchitecturalmetrics.h"
-#include "ui_jsarchitecturalmetrics.h"
+#include "jsarchitecturalmetricsconfig.h"
+
+#include "ui_jsarchitecturalmetricsconfig.h"
 
 #include <duseinterfaces/iplugincontroller.h>
 
@@ -54,9 +15,9 @@
 namespace DuSE
 {
 
-JsArchitecturalMetrics::JsArchitecturalMetrics(QWidget *parent) :
+JsArchitecturalMetricsConfig::JsArchitecturalMetricsConfig(QWidget *parent) :
     QDialog(parent),
-    _ui(new Ui::JsArchitecturalMetrics)
+    _ui(new Ui::JsArchitecturalMetricsConfig)
 {
     QDir jsArchitecturalMetricsDir(QCoreApplication::applicationDirPath());
 
@@ -64,7 +25,7 @@ JsArchitecturalMetrics::JsArchitecturalMetrics(QWidget *parent) :
     jsArchitecturalMetricsDir.cd("src/plugins/jsarchitecturalmetrics/");
 
     _jsArchitecturalMetricsDir = jsArchitecturalMetricsDir.absolutePath();
-    _jsonFileName = "jsarchitecturalmetrics.json";
+    _jsonFileName = "jsarchitecturalmetrics.json"; //refatorar, colocar na classe "principal"
 
     _ui->setupUi(this);
 
@@ -73,19 +34,19 @@ JsArchitecturalMetrics::JsArchitecturalMetrics(QWidget *parent) :
 
 }
 
-JsArchitecturalMetrics::~JsArchitecturalMetrics()
+JsArchitecturalMetricsConfig::~JsArchitecturalMetricsConfig()
 {
     delete _ui;
 }
 
-void JsArchitecturalMetrics::loadPanel()
+void JsArchitecturalMetricsConfig::loadPanel()
 {
     clearMetricsInfo();
     loadMetricsInfo();
     show();
 }
 
-void JsArchitecturalMetrics::setMetricDefault()
+void JsArchitecturalMetricsConfig::setMetricDefault()
 {
     QFile jsonFile(_jsArchitecturalMetricsDir+"/"+_jsonFileName);
     QString contentJsonFile;
@@ -108,17 +69,17 @@ void JsArchitecturalMetrics::setMetricDefault()
     jsonFile.close();
 }
 
-void JsArchitecturalMetrics::runSelectedScript()
+void JsArchitecturalMetricsConfig::runSelectedScript()
 {
     int selectedRow = _ui->scriptsMetricsTable->currentRow();
 
     QString scriptFileName = _ui->scriptsMetricsTable->item(selectedRow,2)->text();
 
-    if(!runScript(scriptFileName))
-        qWarning() << "Couldn't run the selected metric.";
+//    if(!runScript(scriptFileName))
+//        qWarning() << "Couldn't run the selected metric.";
 }
 
-void JsArchitecturalMetrics::runDefaultScript()
+void JsArchitecturalMetricsConfig::runDefaultScript()
 {
     QFile jsonFile(_jsArchitecturalMetricsDir+"/"+ _jsonFileName);
     QString contentJsonFile;
@@ -136,11 +97,11 @@ void JsArchitecturalMetrics::runDefaultScript()
 
     QString scriptMetricDefault = jsonObject.value("MetricDefault").toString();
 
-    if(!runScript(scriptMetricDefault))
-        qWarning() << "Couldn't run the default metric.";
+//    if(!runScript(scriptMetricDefault))
+//        qWarning() << "Couldn't run the default metric.";
 }
 
-void JsArchitecturalMetrics::clearMetricsInfo()
+void JsArchitecturalMetricsConfig::clearMetricsInfo()
 {
     while(_ui->scriptsMetricsTable->rowCount()>0) {
         _ui->scriptsMetricsTable->removeRow(0);
@@ -148,7 +109,7 @@ void JsArchitecturalMetrics::clearMetricsInfo()
     _ui->metricDefaultComboBox->clear();
 }
 
-void JsArchitecturalMetrics::loadMetricsInfo()
+void JsArchitecturalMetricsConfig::loadMetricsInfo()
 {
     _ui->scriptsMetricsTable->setColumnWidth(1, 240);
     _ui->scriptsMetricsTable->setColumnWidth(2, 110);
@@ -196,23 +157,23 @@ void JsArchitecturalMetrics::loadMetricsInfo()
     }
 }
 
-bool JsArchitecturalMetrics::runScript(QString scriptFileName)
-{
+//bool JsArchitecturalMetricsConfig::runScript(QString scriptFileName)
+//{
 
-    QFile scriptFile(_jsArchitecturalMetricsDir+"/scripts/"+scriptFileName);
-    QString contentScriptFile;
+//    QFile scriptFile(_jsArchitecturalMetricsDir+"/scripts/"+scriptFileName);
+//    QString contentScriptFile;
 
-    if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning("Couldn't open metric script file.");
-        return false;
-    }
+//    if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+//        qWarning("Couldn't open metric script file.");
+//        return false;
+//    }
 
-    contentScriptFile = scriptFile.readAll();
-    scriptFile.close();
+//    contentScriptFile = scriptFile.readAll();
+//    scriptFile.close();
 
-    qDebug() << contentScriptFile;
+//    qDebug() << contentScriptFile;
 
-    return true;
-}
+//    return true;
+//}
 
 }

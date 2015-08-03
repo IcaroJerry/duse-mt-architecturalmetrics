@@ -1,5 +1,5 @@
-#ifndef JSARCHITECTURALMETRICS_H
-#define JSARCHITECTURALMETRICS_H
+#ifndef JSARCHITECTURALMETRICSCONFIG_H
+#define JSARCHITECTURALMETRICSCONFIG_H
 
 #include <QtWidgets/QDialog>
 
@@ -9,16 +9,16 @@ namespace DuSE
 {
 
 namespace Ui {
-    class JsArchitecturalMetrics;
+    class JsArchitecturalMetricsConfig;
 }
 
-class JsArchitecturalMetrics : public QDialog
+class JsArchitecturalMetricsConfig : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit JsArchitecturalMetrics(QWidget *parent = 0);
-    ~JsArchitecturalMetrics();
+    explicit JsArchitecturalMetricsConfig(QWidget *parent = 0);
+    ~JsArchitecturalMetricsConfig();
 
     QString _jsArchitecturalMetricsDir;
     QString _jsonFileName;
@@ -32,13 +32,13 @@ public Q_SLOTS:
 private:
     void clearMetricsInfo();
     void loadMetricsInfo();
-    bool runScript(QString scriptFileName);
+    //bool runScript(QString scriptFileName);
 
     QDialog *_jsArchitecturalMetricsDialog;
-    Ui::JsArchitecturalMetrics *_ui;
+    Ui::JsArchitecturalMetricsConfig *_ui;
 
 };
 
-#endif // JSARCHITECTURALMETRICS_H
+#endif // JSARCHITECTURALMETRICSCONFIG_H
 
 }
