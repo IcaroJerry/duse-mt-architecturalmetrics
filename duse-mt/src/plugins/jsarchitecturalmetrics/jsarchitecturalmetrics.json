@@ -6,11 +6,6 @@
     "Name": "Run Architectural Metrics",
     "ScriptsFile": [
         {
-            "MetricName": "Teste2",
-            "ScriptFile": "teste_2.js",
-            "ShortDescription": "It's a Teste2"
-        },
-        {
             "MetricName": "Metric Example",
             "ScriptFile": "scriptexample.js",
             "ShortDescription": "blablabla"

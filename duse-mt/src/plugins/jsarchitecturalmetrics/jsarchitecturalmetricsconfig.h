@@ -1,9 +1,9 @@
 #ifndef JSARCHITECTURALMETRICSCONFIG_H
 #define JSARCHITECTURALMETRICSCONFIG_H
 
-#include <QtWidgets/QDialog>
-
 #include <duseinterfaces/iplugin.h>
+
+#include <QtWidgets/QDialog>
 
 namespace DuSE
 {
@@ -22,23 +22,21 @@ public:
 
     QString _jsArchitecturalMetricsDir;
     QString _jsonFileName;
+    QString scriptNameFileSelected();
 
 public Q_SLOTS:
     void loadPanel();
     void setMetricDefault();
     void runSelectedScript();
-    void runDefaultScript();
 
 private:
     void clearMetricsInfo();
     void loadMetricsInfo();
-    //bool runScript(QString scriptFileName);
 
     QDialog *_jsArchitecturalMetricsDialog;
     Ui::JsArchitecturalMetricsConfig *_ui;
-
 };
 
-#endif // JSARCHITECTURALMETRICSCONFIG_H
-
 }
+
+#endif // JSARCHITECTURALMETRICSCONFIG_H

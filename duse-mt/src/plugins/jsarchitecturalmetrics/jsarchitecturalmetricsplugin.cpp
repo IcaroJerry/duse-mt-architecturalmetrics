@@ -107,15 +107,12 @@ bool JsArchitecturalMetricsPlugin::initialize()
 
     QAction *actionRunScript = new QAction(QIcon::fromTheme(iconName), tr("Run Architectural Metric"), this);
     actionRunScript->setData(QVariant::fromValue(metricDefault));
-    connect(actionRunScript, SIGNAL(triggered()), this, SLOT(runScript()));
+    connect(actionRunScript, SIGNAL(triggered()), this, SLOT(runDefaultScript()));
     ICore::self()->uiController()->addAction(actionRunScript, "", toolbarName);
 
     QWidget *jsWidget = new QWidget;
     _jsArchitecturalMetrics->setupUi(jsWidget);
     ICore::self()->uiController()->addDockWidget(Qt::BottomDockWidgetArea, tr("Architectural Metrics Output"), jsWidget);
-
-    //_jsArchitecturalMetrics->txeJsMetricEvaluation->installEventFilter(this);
-    //_codeCompletionView->installEventFilter(this);
 
     _codeCompletionView->setParent(_jsArchitecturalMetrics->txeJsMetricEvaluation);
     _codeCompletionView->hide();
@@ -157,17 +154,42 @@ void JsArchitecturalMetricsPlugin::destroyEngine()
     _jsArchitecturalMetrics->txeJsMetricEvaluation->clear();
 }
 
-void JsArchitecturalMetricsPlugin::runScript()
+void JsArchitecturalMetricsPlugin::runDefaultScript()
 {
     QAction *action;
-    QString metricScript;
 
     if ((action = qobject_cast<QAction *>(sender()))) {
-        metricScript = action->data().toString();
 
-        _jsArchitecturalMetrics->txeJsMetricEvaluation->setText(_engine->evaluate(metricScript).toString());
+        QString metricDefault = action->data().toString();
+
+        if(!runScript(metricDefault))
+            qWarning() << "Couldn't run the default metric.";
     }
-    qDebug() << metricScript;
+}
+
+void JsArchitecturalMetricsPlugin::runSelectedScript()
+{
+    QString scriptFileName = _jsArchitecturalMetricsConfig->scriptNameFileSelected();
+
+    if(!runScript(scriptFileName))
+        qWarning() << "Couldn't run the selected metric.";
+}
+
+bool JsArchitecturalMetricsPlugin::runScript(QString scriptFileName)
+{
+    QFile scriptFile(_jsArchitecturalMetricsConfig->_jsArchitecturalMetricsDir+"/scripts/"+scriptFileName);
+    QString contentScriptFile;
+
+    if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning("Couldn't open metric script file.");
+        return false;
+    }
+
+    contentScriptFile = scriptFile.readAll();
+    scriptFile.close();
+    _jsArchitecturalMetrics->txeJsMetricEvaluation->setText(_engine->evaluate(contentScriptFile).toString());
+
+    return true;
 }
 
 }

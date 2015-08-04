@@ -33,12 +33,15 @@ public:
     ~JsArchitecturalMetricsPlugin();
 
     virtual bool initialize();
+    bool runScript(QString scriptFileName);
+//    void runSelectedScript();
 
 private Q_SLOTS:
     void setSelfProperty(QModelingObject *modelingObject);
     void initializeEngine(QList<QModelingObject *> modelingObjects);
     void destroyEngine();
-    void runScript();
+    void runDefaultScript();
+    void runSelectedScript();
 
 private:
     JsArchitecturalMetricsConfig *_jsArchitecturalMetricsConfig;
@@ -50,4 +53,3 @@ private:
 }
 
 #endif // JSARCHITECTURALMETRICSPLUGIN_H
-
