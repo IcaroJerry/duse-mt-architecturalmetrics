@@ -3,22 +3,16 @@
     "IconName": "accessories-calculator",
     "MenuName": "menu_Actions",
     "MetricDefault": "component_point.js",
-    "Name": "Run Architectural Metrics",
     "ScriptsFile": [
         {
             "MetricName": "Metric Example",
             "ScriptFile": "scriptexample.js",
-            "ShortDescription": "blablabla"
+            "ShortDescription": "It's just a example."
         },
         {
             "MetricName": "Component Point",
             "ScriptFile": "component_point.js",
-            "ShortDescription": "Component Point is a..."
-        },
-        {
-            "MetricName": "Teste1",
-            "ScriptFile": "teste_1.js",
-            "ShortDescription": "It's a Teste1"
+            "ShortDescription": "CP aims to measure the complexity and scale the system level of a CBSS specified in the UML."
         }
     ],
     "ToolbarName": "mainToolBar",
