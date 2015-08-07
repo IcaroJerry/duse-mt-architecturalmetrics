@@ -99,14 +99,12 @@ bool JsArchitecturalMetricsPlugin::initialize()
     QString menuName = jsonObject.value(QString("MenuName")).toString();
     QString toolbarName = jsonObject.value(QString("ToolbarName")).toString();
     QString iconName = jsonObject.value(QString("IconName")).toString();
-    QString metricDefault = jsonObject.value(QString("MetricDefault")).toString();
 
     QAction *actionLoadPanel = new QAction(QIcon::fromTheme(iconName), tr("Architectural Metrics..."), this);
     connect(actionLoadPanel, SIGNAL(triggered()), _jsArchitecturalMetricsConfig, SLOT(loadPanel()));
     ICore::self()->uiController()->addAction(actionLoadPanel, menuName);
 
     QAction *actionRunScript = new QAction(QIcon::fromTheme(iconName), tr("Run Architectural Metric"), this);
-    actionRunScript->setData(QVariant::fromValue(metricDefault));
     connect(actionRunScript, SIGNAL(triggered()), this, SLOT(runDefaultScript()));
     ICore::self()->uiController()->addAction(actionRunScript, "", toolbarName);
 
@@ -159,8 +157,17 @@ void JsArchitecturalMetricsPlugin::runDefaultScript()
     QAction *action;
 
     if ((action = qobject_cast<QAction *>(sender()))) {
+        QFile jsonFile(_jsArchitecturalMetricsConfig->_jsArchitecturalMetricsDir+"/"+_jsArchitecturalMetricsConfig->_jsonFileName);
+        QString contentJsonFile;
 
-        QString metricDefault = action->data().toString();
+        jsonFile.open(QIODevice::ReadOnly | QIODevice::Text);
+        contentJsonFile = jsonFile.readAll();
+        jsonFile.close();
+
+        QJsonDocument jsonDocument = QJsonDocument::fromJson(contentJsonFile.toUtf8());
+        QJsonObject jsonObject = jsonDocument.object();
+
+        QString metricDefault = jsonObject.value(QString("MetricDefault")).toString();
 
         if(!runScript(metricDefault))
             qWarning() << "Couldn't run the default metric.";
